@@ -9612,6 +9612,7 @@ var Inputs;
     Inputs["Type"] = "type";
     Inputs["Message"] = "message";
     Inputs["TagSha"] = "tag_sha";
+    Inputs["OnTagExists"] = "on_tag_exists";
     Inputs["Debug"] = "debug";
 })(Inputs = exports.Inputs || (exports.Inputs = {}));
 var Outputs;
@@ -9692,17 +9693,21 @@ function getRefByTag(github, inputs) {
             const github = (0, github_1.getOctokit)(process.env.GITHUB_TOKEN);
             core.info(`Start get release with:\n  owner: ${inputs.owner}\n  repo: ${inputs.repo}`);
             if ((yield getRefByTag(github, inputs)) != null) {
-                const refResponse = yield github.rest.git.updateRef({
-                    owner: inputs.owner,
-                    repo: inputs.repo,
-                    ref: `refs/tags/${inputs.tag}`,
-                    sha: inputs.tag_sha,
-                    force: true
-                });
-                if (!isSuccessStatusCode(refResponse.status))
-                    throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
-                (0, io_helper_1.setOutputs)(refResponse.data);
-                core.info(`Updated ${inputs.tag} reference to ${inputs.tag_sha}`);
+                if (inputs.on_tag_exists === 'error')
+                    throw new Error(`The ${inputs.tag} tag already exists.`);
+                if (inputs.on_tag_exists === 'update') {
+                    const refResponse = yield github.rest.git.updateRef({
+                        owner: inputs.owner,
+                        repo: inputs.repo,
+                        ref: `refs/tags/${inputs.tag}`,
+                        sha: inputs.tag_sha,
+                        force: true
+                    });
+                    if (!isSuccessStatusCode(refResponse.status))
+                        throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
+                    (0, io_helper_1.setOutputs)(refResponse.data);
+                    core.info(`Updated ${inputs.tag} reference to ${inputs.tag_sha}`);
+                }
             }
             else {
                 const createResponse = yield github.rest.git.createTag({
@@ -9811,6 +9816,10 @@ function getInputs() {
     }
     else {
         throw new Error(`Invalid type provided! Must be one of 'commit', 'tree', 'blob'.`);
+    }
+    result.on_tag_exists = core.getInput(constants_1.Inputs.OnTagExists, { required: false });
+    if (!['skip', 'update', 'error'].includes(result.on_tag_exists)) {
+        result.on_tag_exists = 'skip';
     }
     result.message = core.getInput(constants_1.Inputs.Message, { required: false });
     if (isBlank(result.message))

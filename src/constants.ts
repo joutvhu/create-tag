@@ -5,6 +5,7 @@ export enum Inputs {
     Type = 'type',
     Message = 'message',
     TagSha = 'tag_sha',
+    OnTagExists = 'on_tag_exists',
     Debug = 'debug'
 }
 

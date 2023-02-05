@@ -1,0 +1,32 @@
+name: Update Tag
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get Current Release
+        id: current_release
+        uses: joutvhu/get-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set version by release
+        id: major_version
+        run: |
+          echo "::set-output name=version::$(echo ${{ steps.current_release.outputs.tag_name }} | cut -f 1 -d .)"
+
+      - name: Get latest release
+        uses: ./
+        with:
+          tag_name: ${{ steps.major_version.outputs.version }}
+          message: ${{ steps.current_release.outputs.name }}
+          on_tag_exists: update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

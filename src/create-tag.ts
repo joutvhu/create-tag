@@ -30,20 +30,24 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
         core.info(`Start get release with:\n  owner: ${inputs.owner}\n  repo: ${inputs.repo}`);
 
         if (await getRefByTag(github, inputs) != null) {
-            const refResponse = await github.rest.git.updateRef({
-                owner: inputs.owner,
-                repo: inputs.repo,
-                ref: `refs/tags/${inputs.tag}`,
-                sha: inputs.tag_sha,
-                force: true
-            });
+            if (inputs.on_tag_exists === 'error')
+                throw new Error(`The ${inputs.tag} tag already exists.`);
+            if (inputs.on_tag_exists === 'update') {
+                const refResponse = await github.rest.git.updateRef({
+                    owner: inputs.owner,
+                    repo: inputs.repo,
+                    ref: `refs/tags/${inputs.tag}`,
+                    sha: inputs.tag_sha,
+                    force: true
+                });
 
-            if (!isSuccessStatusCode(refResponse.status))
-                throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
+                if (!isSuccessStatusCode(refResponse.status))
+                    throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
 
-            setOutputs(refResponse.data);
+                setOutputs(refResponse.data);
 
-            core.info(`Updated ${inputs.tag} reference to ${inputs.tag_sha}`);
+                core.info(`Updated ${inputs.tag} reference to ${inputs.tag_sha}`);
+            }
         } else {
             const createResponse = await github.rest.git.createTag({
                 owner: inputs.owner,

@@ -12,6 +12,8 @@ export interface ReleaseInputs {
     message: string;
     tag_sha: string;
 
+    on_tag_exists: 'skip' | 'update' | 'error';
+
     debug: boolean;
 }
 
@@ -63,6 +65,11 @@ export function getInputs(): ReleaseInputs {
         result.type = type;
     } else {
         throw new Error(`Invalid type provided! Must be one of 'commit', 'tree', 'blob'.`);
+    }
+
+    result.on_tag_exists = core.getInput(Inputs.OnTagExists, {required: false});
+    if (!['skip', 'update', 'error'].includes(result.on_tag_exists)) {
+        result.on_tag_exists = 'skip';
     }
 
     result.message = core.getInput(Inputs.Message, {required: false});

@@ -25,6 +25,10 @@ inputs:
   message:
     description: The tag message.
     required: false
+  on_tag_exists:
+    description: 'Indicate what to do if the tag_name already exists. Options: skip, update, error. Default skip.'
+    required: false
+    default: skip
 
   debug:
     description: Show ouputs
