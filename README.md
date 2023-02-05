@@ -1,6 +1,8 @@
 # Create Tag
 
-GitHub Action to create or update tag
+GitHub Action to create or update tag.
+Useful when you want to create/update major version tag every time there is a release.
+It works well with [GitHub Action versioning](https://docs.github.com/en/actions/creating-actions/about-custom-actions#using-tags-for-release-management).
 
 ## Usage
 
