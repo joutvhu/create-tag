@@ -9674,11 +9674,13 @@ function isSuccessStatusCode(statusCode) {
 function isRefTagExists(github, inputs) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const ref = yield github.rest.git.getRef({
+            const params = {
                 owner: inputs.owner,
                 repo: inputs.repo,
-                ref: `refs/tags/${inputs.tag}`
-            });
+                ref: `tags/${inputs.tag}`
+            };
+            core.debug(`Getting reference for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+            const ref = yield github.rest.git.getRef(params);
             core.debug(`The reference data of ${inputs.tag} tag: ${JSON.stringify(ref.data)}.`);
             return ref.data != null;
         }

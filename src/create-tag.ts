@@ -11,11 +11,13 @@ function isSuccessStatusCode(statusCode?: number): boolean {
 
 async function isRefTagExists(github: InstanceType<typeof GitHub>, inputs: ReleaseInputs): Promise<boolean> {
     try {
-        const ref = await github.rest.git.getRef({
+        const params: RestEndpointMethodTypes["git"]["getRef"]["parameters"] = {
             owner: inputs.owner,
             repo: inputs.repo,
-            ref: `refs/tags/${inputs.tag}`
-        });
+            ref: `tags/${inputs.tag}`
+        };
+        core.debug(`Getting reference for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+        const ref = await github.rest.git.getRef(params);
         core.debug(`The reference data of ${inputs.tag} tag: ${JSON.stringify(ref.data)}.`);
         return ref.data != null;
     } catch (e: any) {
