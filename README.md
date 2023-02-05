@@ -37,7 +37,7 @@ on:
     types: [released]
 
 jobs:
-  test:
+  tagging:
     runs-on: ubuntu-latest
     permissions:
       contents: write
