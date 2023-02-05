@@ -16,9 +16,10 @@ async function isRefTagExists(github: InstanceType<typeof GitHub>, inputs: Relea
             repo: inputs.repo,
             ref: `refs/tags/${inputs.tag}`
         });
-        core.debug(`The tag reference of ${inputs.tag}: ${JSON.stringify(ref.data)}.`);
+        core.debug(`The reference data of ${inputs.tag} tag: ${JSON.stringify(ref.data)}.`);
         return ref.data != null;
-    } catch {
+    } catch (e: any) {
+        core.warning(`Get reference of ${inputs.tag} tag error with status ${e.status}, message: ${e.message}.`);
         return false;
     }
 }
