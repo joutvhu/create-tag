@@ -1,5 +1,5 @@
-name: Get Release
-description: Get a release by tag, latest or current release
+name: Create Or Update Tag
+description: GitHub Action to create or update tag
 author: Giao Ho
 inputs:
   owner:
