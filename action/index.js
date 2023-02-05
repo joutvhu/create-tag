@@ -9671,7 +9671,7 @@ function isSuccessStatusCode(statusCode) {
         return false;
     return statusCode >= 200 && statusCode < 300;
 }
-function getRefByTag(github, inputs) {
+function isRefTagExists(github, inputs) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const ref = yield github.rest.git.getRef({
@@ -9679,10 +9679,11 @@ function getRefByTag(github, inputs) {
                 repo: inputs.repo,
                 ref: `refs/tags/${inputs.tag}`
             });
-            return ref.data;
+            core.debug(`The tag reference of ${inputs.tag}: ${JSON.stringify(ref.data)}.`);
+            return ref.data != null;
         }
         catch (_a) {
-            return undefined;
+            return false;
         }
     });
 }
@@ -9692,7 +9693,7 @@ function getRefByTag(github, inputs) {
             const inputs = (0, io_helper_1.getInputs)();
             const github = (0, github_1.getOctokit)(process.env.GITHUB_TOKEN);
             core.info(`Start get release with:\n  owner: ${inputs.owner}\n  repo: ${inputs.repo}`);
-            if ((yield getRefByTag(github, inputs)) != null) {
+            if (yield isRefTagExists(github, inputs)) {
                 if (inputs.on_tag_exists === 'error')
                     throw new Error(`The ${inputs.tag} tag already exists.`);
                 if (inputs.on_tag_exists === 'skip') {
@@ -9706,7 +9707,7 @@ function getRefByTag(github, inputs) {
                         sha: inputs.tag_sha,
                         force: true
                     };
-                    core.debug(`Updating references for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+                    core.debug(`Updating reference for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
                     const refResponse = yield github.rest.git.updateRef(params);
                     if (!isSuccessStatusCode(refResponse.status))
                         throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
@@ -9733,7 +9734,7 @@ function getRefByTag(github, inputs) {
                     ref: `refs/tags/${inputs.tag}`,
                     sha: inputs.tag_sha
                 };
-                core.debug(`Creating references for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+                core.debug(`Creating reference for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
                 const refResponse = yield github.rest.git.createRef(refParams);
                 if (!isSuccessStatusCode(refResponse.status))
                     throw new Error(`Failed to create tag ref with status ${refResponse.status}`);

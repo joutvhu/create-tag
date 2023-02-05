@@ -9,16 +9,17 @@ function isSuccessStatusCode(statusCode?: number): boolean {
     return statusCode >= 200 && statusCode < 300;
 }
 
-async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseInputs): Promise<RestEndpointMethodTypes['git']['getRef']['response']['data'] | undefined> {
+async function isRefTagExists(github: InstanceType<typeof GitHub>, inputs: ReleaseInputs): Promise<boolean> {
     try {
         const ref = await github.rest.git.getRef({
             owner: inputs.owner,
             repo: inputs.repo,
             ref: `refs/tags/${inputs.tag}`
         });
-        return ref.data;
+        core.debug(`The tag reference of ${inputs.tag}: ${JSON.stringify(ref.data)}.`);
+        return ref.data != null;
     } catch {
-        return undefined;
+        return false;
     }
 }
 
@@ -29,7 +30,7 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
 
         core.info(`Start get release with:\n  owner: ${inputs.owner}\n  repo: ${inputs.repo}`);
 
-        if (await getRefByTag(github, inputs) != null) {
+        if (await isRefTagExists(github, inputs)) {
             if (inputs.on_tag_exists === 'error')
                 throw new Error(`The ${inputs.tag} tag already exists.`);
             if (inputs.on_tag_exists === 'skip') {
@@ -42,7 +43,7 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
                     sha: inputs.tag_sha,
                     force: true
                 }
-                core.debug(`Updating references for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+                core.debug(`Updating reference for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
                 const refResponse = await github.rest.git.updateRef(params);
 
                 if (!isSuccessStatusCode(refResponse.status))
@@ -73,7 +74,7 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
                 ref: `refs/tags/${inputs.tag}`,
                 sha: inputs.tag_sha
             };
-            core.debug(`Creating references for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+            core.debug(`Creating reference for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
             const refResponse = await github.rest.git.createRef(refParams);
 
             if (!isSuccessStatusCode(refResponse.status))
