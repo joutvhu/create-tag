@@ -1,6 +1,6 @@
 {
   "name": "create-tag",
-  "version": "1.0.",
+  "version": "1.0.0",
   "description": "GitHub Action to create tag",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.json",

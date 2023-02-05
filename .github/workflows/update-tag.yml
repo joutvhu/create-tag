@@ -1,4 +1,4 @@
-name: Update Tag
+name: Create Major Version Tag
 
 on:
   release:
@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "::set-output name=version::$(echo ${{ steps.current_release.outputs.tag_name }} | cut -f 1 -d .)"
 
-      - name: Create/Update major version
+      - name: Create or update major version
         uses: ./
         with:
           tag_name: ${{ steps.major_version.outputs.version }}
