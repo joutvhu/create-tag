@@ -1,9 +1,8 @@
-name: Create Major Version Tag
+name: Update Major Version Tag
 
 on:
   release:
     types: [released]
-  workflow_dispatch:
 
 jobs:
   tagging:
