@@ -45,4 +45,4 @@ runs:
   main: action/index.js
 branding:
   icon: tag
-  color: red
+  color: orange
