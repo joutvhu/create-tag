@@ -9699,14 +9699,15 @@ function getRefByTag(github, inputs) {
                     core.warning(`The ${inputs.tag} tag already exists.`);
                 }
                 else if (inputs.on_tag_exists === 'update') {
-                    core.debug(`Updating references for ${inputs.tag} tag.`);
-                    const refResponse = yield github.rest.git.updateRef({
+                    const params = {
                         owner: inputs.owner,
                         repo: inputs.repo,
                         ref: `refs/tags/${inputs.tag}`,
                         sha: inputs.tag_sha,
                         force: true
-                    });
+                    };
+                    core.debug(`Updating references for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+                    const refResponse = yield github.rest.git.updateRef(params);
                     if (!isSuccessStatusCode(refResponse.status))
                         throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
                     (0, io_helper_1.setOutputs)(refResponse.data, inputs.debug);
@@ -9714,24 +9715,26 @@ function getRefByTag(github, inputs) {
                 }
             }
             else {
-                core.debug(`Creating ${inputs.tag} tag.`);
-                const createResponse = yield github.rest.git.createTag({
+                const params = {
                     owner: inputs.owner,
                     repo: inputs.repo,
                     tag: inputs.tag,
                     object: inputs.tag_sha,
                     type: inputs.type,
                     message: inputs.message
-                });
+                };
+                core.debug(`Creating ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+                const createResponse = yield github.rest.git.createTag(params);
                 if (!isSuccessStatusCode(createResponse.status))
                     throw new Error(`Failed to create tag object with status ${createResponse.status}`);
-                core.debug(`Creating references for ${inputs.tag} tag.`);
-                const refResponse = yield github.rest.git.createRef({
+                const refParams = {
                     owner: inputs.owner,
                     repo: inputs.repo,
                     ref: `refs/tags/${inputs.tag}`,
                     sha: inputs.tag_sha
-                });
+                };
+                core.debug(`Creating references for ${inputs.tag} tag with params: ${JSON.stringify(params)}.`);
+                const refResponse = yield github.rest.git.createRef(refParams);
                 if (!isSuccessStatusCode(refResponse.status))
                     throw new Error(`Failed to create tag ref with status ${refResponse.status}`);
                 (0, io_helper_1.setOutputs)(refResponse.data, inputs.debug);
