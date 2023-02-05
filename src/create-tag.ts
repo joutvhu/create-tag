@@ -42,7 +42,7 @@ async function isRefTagExists(github: InstanceType<typeof GitHub>, inputs: Relea
                 const params: RestEndpointMethodTypes["git"]["updateRef"]["parameters"] = {
                     owner: inputs.owner,
                     repo: inputs.repo,
-                    ref: `refs/tags/${inputs.tag}`,
+                    ref: `tags/${inputs.tag}`,
                     sha: inputs.tag_sha,
                     force: true
                 }

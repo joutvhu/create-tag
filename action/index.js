@@ -9706,7 +9706,7 @@ function isRefTagExists(github, inputs) {
                     const params = {
                         owner: inputs.owner,
                         repo: inputs.repo,
-                        ref: `refs/tags/${inputs.tag}`,
+                        ref: `tags/${inputs.tag}`,
                         sha: inputs.tag_sha,
                         force: true
                     };
