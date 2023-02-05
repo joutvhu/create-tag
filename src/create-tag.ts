@@ -32,7 +32,10 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
         if (await getRefByTag(github, inputs) != null) {
             if (inputs.on_tag_exists === 'error')
                 throw new Error(`The ${inputs.tag} tag already exists.`);
-            if (inputs.on_tag_exists === 'update') {
+            if (inputs.on_tag_exists === 'skip') {
+                core.warning(`The ${inputs.tag} tag already exists.`);
+            } else if (inputs.on_tag_exists === 'update') {
+                core.debug(`Updating references for ${inputs.tag} tag.`);
                 const refResponse = await github.rest.git.updateRef({
                     owner: inputs.owner,
                     repo: inputs.repo,
@@ -44,11 +47,12 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
                 if (!isSuccessStatusCode(refResponse.status))
                     throw new Error(`Failed to update tag ref with status ${refResponse.status}`);
 
-                setOutputs(refResponse.data);
+                setOutputs(refResponse.data, inputs.debug);
 
                 core.info(`Updated ${inputs.tag} reference to ${inputs.tag_sha}`);
             }
         } else {
+            core.debug(`Creating ${inputs.tag} tag.`);
             const createResponse = await github.rest.git.createTag({
                 owner: inputs.owner,
                 repo: inputs.repo,
@@ -61,6 +65,7 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
             if (!isSuccessStatusCode(createResponse.status))
                 throw new Error(`Failed to create tag object with status ${createResponse.status}`);
 
+            core.debug(`Creating references for ${inputs.tag} tag.`);
             const refResponse = await github.rest.git.createRef({
                 owner: inputs.owner,
                 repo: inputs.repo,
@@ -71,11 +76,12 @@ async function getRefByTag(github: InstanceType<typeof GitHub>, inputs: ReleaseI
             if (!isSuccessStatusCode(refResponse.status))
                 throw new Error(`Failed to create tag ref with status ${refResponse.status}`);
 
-            setOutputs(refResponse.data);
+            setOutputs(refResponse.data, inputs.debug);
 
             core.info(`Tagged ${createResponse.data.sha} as ${inputs.tag}`);
         }
     } catch (err: any) {
+        core.debug(`Error status: ${err.status}`);
         core.setFailed(err.message);
     }
 })();
