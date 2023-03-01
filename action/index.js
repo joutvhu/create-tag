@@ -9685,7 +9685,8 @@ function isRefTagExists(github, inputs) {
             return ref.data != null;
         }
         catch (e) {
-            core.warning(`Get reference of ${inputs.tag} tag error with status ${e.status}, message: ${e.message}.`);
+            if (inputs.debug)
+                core.warning(`Get reference of ${inputs.tag} tag error with status ${e.status}, message: ${e.message}.`);
             return false;
         }
     });
@@ -9699,8 +9700,11 @@ function isRefTagExists(github, inputs) {
             if (yield isRefTagExists(github, inputs)) {
                 if (inputs.on_tag_exists === 'error')
                     throw new Error(`The ${inputs.tag} tag already exists.`);
-                if (inputs.on_tag_exists === 'skip') {
+                if (inputs.on_tag_exists === 'warn') {
                     core.warning(`The ${inputs.tag} tag already exists.`);
+                }
+                else if (inputs.on_tag_exists === 'skip') {
+                    core.info(`The ${inputs.tag} tag already exists.`);
                 }
                 else if (inputs.on_tag_exists === 'update') {
                     const params = {
@@ -9832,7 +9836,7 @@ function getInputs() {
         throw new Error(`Invalid type provided! Must be one of 'commit', 'tree', 'blob'.`);
     }
     result.on_tag_exists = core.getInput(constants_1.Inputs.OnTagExists, { required: false });
-    if (!['skip', 'update', 'error'].includes(result.on_tag_exists)) {
+    if (!['skip', 'update', 'warn', 'error'].includes(result.on_tag_exists)) {
         result.on_tag_exists = 'skip';
     }
     result.message = core.getInput(constants_1.Inputs.Message, { required: false });
