@@ -12,7 +12,7 @@ export interface ReleaseInputs {
     message: string;
     tag_sha: string;
 
-    on_tag_exists: 'skip' | 'update' | 'error';
+    on_tag_exists: 'skip' | 'update' | 'warn' | 'error';
 
     debug: boolean;
 }
@@ -68,7 +68,7 @@ export function getInputs(): ReleaseInputs {
     }
 
     result.on_tag_exists = core.getInput(Inputs.OnTagExists, {required: false});
-    if (!['skip', 'update', 'error'].includes(result.on_tag_exists)) {
+    if (!['skip', 'update', 'warn', 'error'].includes(result.on_tag_exists)) {
         result.on_tag_exists = 'skip';
     }
 

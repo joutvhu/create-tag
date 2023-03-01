@@ -18,7 +18,7 @@ For more information on these inputs, see the [API Documentation](https://develo
 - `tag_sha`: The SHA of the git object this is tagging.
 - `type`: The type of the object we're tagging. Normally this is a `commit` but it can also be a `tree` or a `blob`.
 - `message`: The tag message.
-- `on_tag_exists`: Indicate what to do if the tag_name already exists. Options: skip, update, error. Default skip.
+- `on_tag_exists`: Indicate what to do if the tag_name already exists. Options: `skip`, `update`, `warn`, `error`. Default `skip`.
 
 ### Outputs
 

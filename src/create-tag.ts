@@ -21,7 +21,8 @@ async function isRefTagExists(github: InstanceType<typeof GitHub>, inputs: Relea
         core.debug(`The reference data of ${inputs.tag} tag: ${JSON.stringify(ref.data)}.`);
         return ref.data != null;
     } catch (e: any) {
-        core.warning(`Get reference of ${inputs.tag} tag error with status ${e.status}, message: ${e.message}.`);
+        if (inputs.debug)
+            core.warning(`Get reference of ${inputs.tag} tag error with status ${e.status}, message: ${e.message}.`);
         return false;
     }
 }
@@ -36,8 +37,10 @@ async function isRefTagExists(github: InstanceType<typeof GitHub>, inputs: Relea
         if (await isRefTagExists(github, inputs)) {
             if (inputs.on_tag_exists === 'error')
                 throw new Error(`The ${inputs.tag} tag already exists.`);
-            if (inputs.on_tag_exists === 'skip') {
+            if (inputs.on_tag_exists === 'warn') {
                 core.warning(`The ${inputs.tag} tag already exists.`);
+            } else if (inputs.on_tag_exists === 'skip') {
+                core.info(`The ${inputs.tag} tag already exists.`);
             } else if (inputs.on_tag_exists === 'update') {
                 const params: RestEndpointMethodTypes["git"]["updateRef"]["parameters"] = {
                     owner: inputs.owner,
