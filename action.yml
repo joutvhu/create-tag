@@ -41,7 +41,7 @@ outputs:
   tag_sha:
     description: The SHA of the git object this is tagging.
 runs:
-  using: node16
+  using: node20
   main: action/index.js
 branding:
   icon: tag
